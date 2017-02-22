@@ -66,53 +66,9 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=2):
     If you want to make the lines semi-transparent, think about combining
     this function with the weighted_img() function below
     """
-    imshape = img.shape
-    print(img.shape)
-
-    Left_xArr = []
-    Right_xArr = []
-    Left_yArr = []
-    Right_yArr = []
-
     for line in lines:
         for x1,y1,x2,y2 in line:
-            slope = float((y2-y1)/(x2-x1))
-            if not (np.isnan(slope)) or (np.isinf(slope)) or (slope == 0):
-                if  slope < 0:
-                    Left_xArr.append(x1)
-                    Left_xArr.append(x2)
-                    Left_yArr.append(y1)
-                    Left_yArr.append(y2)
-                else:
-                    Right_xArr.append(x1)
-                    Right_xArr.append(x2)
-                    Right_yArr.append(y1)
-                    Right_yArr.append(y2)
-
-    if(len(Left_xArr) <= 0):
-        Left_X_min = 0
-        Left_X_max = 0
-        Left_Y_min = 0
-        Left_Y_max = 0
-    else:
-        Left_X_min = min(Left_xArr)
-        Left_X_max = max(Left_xArr)
-        Left_Y_min = min(Left_yArr)
-        Left_Y_max = max(Left_yArr)
-
-    if(len(Right_xArr) <= 0):
-        Right_X_min = 0
-        Right_X_max = 0
-        Right_Y_min = 0
-        Right_Y_max = 0
-    else:
-        Right_X_min = min(Right_xArr)
-        Right_X_max = max(Right_xArr)
-        Right_Y_min = min(Right_yArr)
-        Right_Y_max = max(Right_yArr)
-
-    cv2.line(img, (Left_X_min, Left_Y_max), (Left_X_max, Left_Y_min), color, thickness)
-    cv2.line(img, (Right_X_max, Right_Y_max), (Right_X_min, Right_Y_min), color, thickness)
+            cv2.line(img, (x1, y1), (x2, y2), color, thickness)
 
 def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
     """
@@ -122,7 +78,7 @@ def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
     """
     lines = cv2.HoughLinesP(img, rho, theta, threshold, np.array([]), minLineLength=min_line_len, maxLineGap=max_line_gap)
     line_img = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-    draw_lines(line_img, lines, [255, 0, 0], 10)
+    draw_lines(line_img, lines, [255, 0, 0], 5)
     return line_img
 
 # Python 3 has support for cool math symbols.
@@ -145,22 +101,24 @@ def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
 def process_image(image):
 
     imshape = image.shape
+    img_height = imshape[0]
+    img_width = imshape[1]
 
-    vertices = np.array([[(0,imshape[0]),
-                          (imshape[1]/2-30, imshape[0]/2+50), 
-                          (imshape[1]/2+30, imshape[0]/2+50), 
-                          (imshape[1],imshape[0])]], 
+    vertices = np.array([[(0,img_height),
+                          (img_width/2-30, img_height/2+60), 
+                          (img_width/2+30, img_height/2+60), 
+                          (img_width,img_height)]], 
                           dtype=np.int32)
 
     gray = grayscale(image)
 
     blur = gaussian_blur(gray, 5)
 
-    can_image = canny(blur, 65, 200)
+    can_image = canny(blur, 50, 150)
 
     region_image = region_of_interest(can_image, vertices)
 
-    huffy = hough_lines(region_image, 1, np.pi/180, 50, 150, 300)
+    huffy = hough_lines(region_image, 4, np.pi/180, 25, 10, 20)
 
     final = weighted_img(huffy, image, .8, 1., 0.)
 
@@ -177,10 +135,10 @@ def process_image(image):
 #print(image.shape)
 #plt.show()
 
-# white_output = 'white.mp4'
-# clip1 = VideoFileClip("solidWhiteRight.mp4")
-# white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
-# white_clip.write_videofile(white_output, audio=False)
+white_output = 'white.mp4'
+clip1 = VideoFileClip("solidWhiteRight.mp4")
+white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
+white_clip.write_videofile(white_output, audio=False)
 
 # white_output = 'yellow.mp4'
 # clip1 = VideoFileClip("solidYellowLeft.mp4")
