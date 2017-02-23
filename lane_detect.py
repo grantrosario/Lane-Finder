@@ -3,6 +3,7 @@ import numpy as np
 from moviepy.editor import VideoFileClip
 from numpy.polynomial import Polynomial as P
 import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
 
 # Keep track of previous left lane x values and right lane x values
 PREV_LEFT_X1 = None
@@ -166,8 +167,7 @@ def process_image(base_image):
 #image = mpimg.imread('test_images/solidYellowCurve2.jpg')
 #image = mpimg.imread('test_images/solidYellowLeft.jpg')
 #image = mpimg.imread('test_images/whiteCarLaneSwitch.jpg')
-#plt.imshow(process_image(image))
-#print(image.shape)
+#plt.imshow(process_image(image)) 
 #plt.show()
 
 white_output = 'white.mp4'
