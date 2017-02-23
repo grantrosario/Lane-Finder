@@ -76,7 +76,7 @@ Combine our new image with lines drawn on with our original image by returning t
 
 A potential shortcoming with this pipeline could be observed by the lines losing accuracy when major events happen such as pavement color changing (making lane lines harder to see) or shadows affecting edge detection.
 
-Another shortcoming could be if the road has a sharp turn. This pipeline is fit using a linear polynomial, thus it will not properly guage a drastic turn in the highway.
+Another shortcoming could be if the road has a sharp turn. This pipeline is fit using a linear polynomial, thus it will not properly gauge a drastic turn in the highway.
   
 ---
 
