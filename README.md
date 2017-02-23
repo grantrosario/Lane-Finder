@@ -66,7 +66,7 @@ The final image after Hough tranform and draw_lines() will look like this:
 
 --
 - **Step 6.**  
-Combine our new image with lines drawn on with or original image by returning the weighted image.  
+Combine our new image with lines drawn on with our original image by returning the weighted image.  
 ![alt text][image7]  
   
 ---
