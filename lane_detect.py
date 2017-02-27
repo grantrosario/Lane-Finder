@@ -27,27 +27,27 @@ def toHSV(img):
 
 def iso_yellow(img):
 
-	# hue_threshold = 90
-	# sat_threshold = 240
-	# val_threshold = 240
 
-	upper_yellow = np.array([30, 255, 255])
 	lower_yellow = np.array([10, 50, 210])
+	upper_yellow = np.array([30, 255, 255])
+	
 
 	mask = cv2.inRange(img, lower_yellow, upper_yellow)
 	return mask
 
 def iso_white(img):
 
-	# hue_threshold = 90
-	# sat_threshold = 240
-	# val_threshold = 240
 
-	upper_yellow = np.array([30, 255, 255])
-	lower_yellow = np.array([10, 50, 210])
+	lower_white = np.array([10, 0, 200])
+	upper_white = np.array([255, 30, 255])
+	
 
-	mask = cv2.inRange(img, lower_yellow, upper_yellow)
+	mask = cv2.inRange(img, lower_white, upper_white)
 	return mask
+
+def combine_mask(img1, img2):
+	new_img = cv2.bitwise_or(img1, img2)
+	return new_img
 
 def canny(img, low_threshold, high_threshold):
     """Applies the Canny transform"""
@@ -189,39 +189,39 @@ def process_image(base_image):
     gray = grayscale(base_image)
     image = toHSV(base_image)
     yellow_mask = iso_yellow(image)
-    image = iso_white(image)
-    #image = iso_yellow(image)
-    return image
-    # image = gaussian_blur(image, 5)
-    # image = canny(image, 50, 150)
-    # image = region_of_interest(image, vertices)
-    # image = hough_lines(image, 1, np.pi/180, 35, 5, 2)
-    # return weighted_img(image, base_image, .8, 1., 0.)
+    white_mask = iso_white(image)
+    all_mask = combine_mask(yellow_mask, white_mask)
+    image = combine_mask(all_mask, gray)
+    image = gaussian_blur(image, 5)
+    image = canny(image, 50, 150)
+    image = region_of_interest(image, vertices)
+    image = hough_lines(image, 1, np.pi/180, 35, 5, 2)
+    return weighted_img(image, base_image, .8, 1., 0.)
 
 
-image = mpimg.imread('test_images/solidYellowCurve.jpg')
+# image = mpimg.imread('test_images/solidYellowCurve.jpg')
 #image = mpimg.imread('test_images/solidWhiteCurve.jpg')
 #image = mpimg.imread('test_images/solidYellowCurve.jpg')
 #image = mpimg.imread('test_images/solidYellowCurve2.jpg')
 #image = mpimg.imread('test_images/solidYellowLeft.jpg')
 #image = mpimg.imread('test_images/whiteCarLaneSwitch.jpg')
-plt.imshow(process_image(image)) 
-plt.show()
+# plt.imshow(process_image(image)) 
+# plt.show()
 
-# white_output = 'white.mp4'
-# clip1 = VideoFileClip("solidWhiteRight.mp4")
-# white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
-# white_clip.write_videofile(white_output, audio=False)
+white_output = 'white.mp4'
+clip1 = VideoFileClip("solidWhiteRight.mp4")
+white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
+white_clip.write_videofile(white_output, audio=False)
 
-# white_output = 'yellow.mp4'
-# clip1 = VideoFileClip("solidYellowLeft.mp4")
-# white_clip = clip1.fl_image(process_image)
-# white_clip.write_videofile(white_output, audio=False)
+white_output = 'yellow.mp4'
+clip1 = VideoFileClip("solidYellowLeft.mp4")
+white_clip = clip1.fl_image(process_image)
+white_clip.write_videofile(white_output, audio=False)
 
-# challenge_output = 'extra.mp4'
-# clip2 = VideoFileClip('challenge.mp4')
-# challenge_clip = clip2.fl_image(process_image)
-# challenge_clip.write_videofile(challenge_output, audio=False)
+challenge_output = 'extra.mp4'
+clip2 = VideoFileClip('challenge.mp4')
+challenge_clip = clip2.fl_image(process_image)
+challenge_clip.write_videofile(challenge_output, audio=False)
 
 # challenge_output = 'home_WhiteDotted.mp4'
 # clip2 = VideoFileClip('WhiteDottedLanes.mp4')
